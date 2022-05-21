@@ -4,11 +4,10 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
+	faceloader "github.com/geeksforsocialchange/faceloader/parser"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -44,29 +43,13 @@ func EventHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EventDataHandler(w http.ResponseWriter, r *http.Request) {
-	var result []map[string]interface{}
+	var result map[string]interface{}
 
 	vars := mux.Vars(r)
 	eventUrl := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
-	res, _ := http.Get(eventUrl)
-	doc, _ := goquery.NewDocumentFromReader(res.Body)
-
-	selector := `script[type="application/ld+json"]`
-	scripts := doc.Find(selector)
-	scripts.Each(func(i int, s *goquery.Selection) {
-		var decoded map[string]interface{}
-		text := s.Text()
-		text = strings.Replace(text, "//<![CDATA[", "", -1)
-		text = strings.Replace(text, "//]]", "", -1)
-		text = strings.Replace(text, ">", "", -1)
-		err := json.Unmarshal([]byte(text), &decoded)
-		if err != nil {
-			log.Println(err)
-		}
-		if err == nil {
-			result = append(result, decoded)
-		}
-	})
-
+	result, err := faceloader.InterfaceFromMbasic(eventUrl)
+	if err != nil {
+		log.Println(err)
+	}
 	json.NewEncoder(w).Encode(result)
 }
