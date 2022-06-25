@@ -1,9 +1,11 @@
 package main
 
 import (
+	"alicekaerast/faceprox/lib"
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	ics "github.com/arran4/golang-ical"
 	faceloader "github.com/geeksforsocialchange/faceloader/parser"
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
@@ -29,8 +31,10 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
 	r.HandleFunc("/events/{key}.json", EventDataHandler)
+	r.HandleFunc("/events/{key}.ics", EventIcalHandler)
 	r.HandleFunc("/events/{key}", EventHandler)
 	r.HandleFunc("/page/{key}.json", PageDataHandler)
+	r.HandleFunc("/page/{key}.ics", PageIcalHandler)
 	r.HandleFunc("/page/{key}", PageHandler)
 
 	srv := &http.Server{
@@ -58,66 +62,42 @@ func PageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EventDataHandler(w http.ResponseWriter, r *http.Request) {
-	var result map[string]interface{}
-	var err error
-
 	vars := mux.Vars(r)
-	eventUrl := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
-	cachedResult, found := c.Get(eventUrl)
-	if found {
-		log.Println("cache hit")
-		result = cachedResult.(map[string]interface{})
-	} else {
-		log.Println("cache miss")
-		result, err = faceloader.InterfaceFromMbasic(eventUrl)
-		if err != nil {
-			log.Println(err)
-		}
-		c.Set(eventUrl, result, cache.DefaultExpiration)
-	}
+	url := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
+	result := lib.GetEvent(url, c)
 	json.NewEncoder(w).Encode(result)
 }
 
-func PageDataHandler(w http.ResponseWriter, r *http.Request) {
-	var events []interface{}
-	var mbasicLinks []string
-	var err error
-
+func EventIcalHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	pageName := vars["key"]
+	url := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
+	result := lib.GetEvent(url, c)
+	ics, err := faceloader.InterfaceToIcal(result)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Fprint(w, ics.Serialize())
+}
 
-	cachedLinks, found := c.Get(pageName)
-	if found {
-		log.Println("cache hit")
-		mbasicLinks = cachedLinks.([]string)
-	} else {
-		log.Println("cache miss")
-		mbasicLinks, err = faceloader.GetFacebookEventLinks(pageName)
-		mbasicLinks = faceloader.RemoveDuplicateStr(mbasicLinks)
+func PageIcalHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	events := lib.GetEvents(vars["key"], c)
+	cal := ics.NewCalendar()
+
+	for i := range events {
+		event, err := faceloader.InterfaceToIcal(events[i])
 		if err != nil {
 			log.Println(err)
-		} else {
-			c.Set(pageName, mbasicLinks, cache.DefaultExpiration)
 		}
+		cal.Components = append(cal.Components, &event)
 	}
-	for i := range mbasicLinks {
-		link := mbasicLinks[i]
+	fmt.Fprint(w, cal.Serialize())
+}
 
-		event, found := c.Get(link)
-		if found {
-			log.Println("cache hit")
-			events = append(events, event.(interface{}))
-		} else {
-			log.Println("cache miss")
-			e, err := faceloader.InterfaceFromMbasic(mbasicLinks[i])
-			if err != nil {
-				log.Println(err)
-			} else {
-				c.Set(link, e, cache.DefaultExpiration)
-			}
-			events = append(events, e)
-		}
+func PageDataHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 
-	}
+	events := lib.GetEvents(vars["key"], c)
 	json.NewEncoder(w).Encode(events)
 }
