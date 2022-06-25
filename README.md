@@ -6,3 +6,5 @@ Listens on port 8000 and responds to the following paths:
 
 * /events/:eventid:
 * /events/:eventid:.json
+* /page/:pagename:
+* /page/:pagename:.json
