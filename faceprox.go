@@ -65,6 +65,7 @@ func EventDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	url := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
 	result := lib.GetEvent(url, c)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
 }
 
@@ -76,6 +77,7 @@ func EventIcalHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
+	w.Header().Set("Content-Type", "calendar/text")
 	fmt.Fprint(w, ics.Serialize())
 }
 
@@ -92,6 +94,7 @@ func PageIcalHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		cal.Components = append(cal.Components, &event)
 	}
+	w.Header().Set("Content-Type", "calendar/text")
 	fmt.Fprint(w, cal.Serialize())
 }
 
@@ -99,5 +102,6 @@ func PageDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	events := lib.GetEvents(vars["key"], c)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(events)
 }
