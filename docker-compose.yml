@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  faceprox:
+    container_name: faceprox
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges
+    cap_drop:
+      - ALL
+    networks:
+      - faceprox
+
+  caddy:
+    container_name: caddy
+    image: caddy:2-alpine
+    network_mode: host
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data:rw
+      - caddy-config:/config:rw
+    environment:
+      - FACEPROX_HOSTNAME=${FACEPROX_HOSTNAME:-http://localhost:80}
+      - FACEPROX_TLS=${LETSENCRYPT_EMAIL:-internal}
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - DAC_OVERRIDE
+
+networks:
+  faceprox:
+    ipam:
+      driver: default
+volumes:
+  caddy-data:
+  caddy-config:
+

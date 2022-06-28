@@ -10,7 +10,12 @@ Download the [latest release](https://github.com/wheresalice/faceprox/releases/l
 
 Alternatively you can build a docker image by cloning this repository, building an image with `docker build -t faceprox .`, and then run that with `docker run -ti -p 8000 faceprox`
 
-Putting an HTTPS proxy in front of Faceprox is left as an exercise for the reader
+### Docker Compose
+
+If you just want to run this with an SSL certificate using docker-compose:
+
+- Edit the [.env](.env) file to set the hostname and an email
+- Check everything is working: `docker-compose up`
 
 ## Usage
 
