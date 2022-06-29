@@ -6,7 +6,7 @@ We're not aware of anybody running public instances of Faceprox yet, so you will
 
 ## Installation
 
-Download the [latest release](https://github.com/wheresalice/faceprox/releases/latest) for your system and run it. It will listen on port 8000
+Download the [latest release](https://github.com/geeksforsocialchange/faceprox/releases/latest) for your system and run it. It will listen on port 8000
 
 Alternatively you can build a docker image by cloning this repository, building an image with `docker build -t faceprox .`, and then run that with `docker run -ti -p 8000 faceprox`
 
