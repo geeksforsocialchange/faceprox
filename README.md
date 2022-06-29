@@ -31,3 +31,7 @@ Open your web browser to http://127.0.0.1:8000 to see the welcome screen, then t
 * /page/:pagename:.ics
 
 where `:eventid:` is a numeric event ID for a single event, and `:pagename:` is a page name for a page that might have multiple events. You can find both of these in the original Facebook URLs
+
+## Known Issues
+
+* The html version is really just for basic testing. It has more javascript than mbasic.facebook.com, and the images may get blocked by Firefox containers or other tracking blockers
