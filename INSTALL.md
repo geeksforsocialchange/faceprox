@@ -16,7 +16,7 @@ Add an 'A' record for your domain of choice pointing to the new server's IP addr
 ## Set up the droplet
 
 1. `ssh root@my-droplet-ip`
-1. `git clone https://github.com/geekforsocialchange/faceprox.git`
+1. `git clone https://github.com/geeksforsocialchange/faceprox.git`
 1. Set your hostname and email in the `.env` file
 1. Run `docker-compose up` and check everything works as it should
 1. When you're ready, run `docker-compose up -d` to run in daemon mode
