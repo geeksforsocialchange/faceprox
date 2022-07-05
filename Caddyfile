@@ -1,13 +1,14 @@
 {
 	admin off
+	# Uncomment the below to use the staging Lets Encrypt server while testing
+	#acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+
+	#log {
+	#	output discard
+	#}
 }
 
 {$FACEPROX_HOSTNAME} {
-	log {
-		output discard
-		# Uncomment the below to use the staging Lets Encrypt server while testing
-		#acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-	}
 	tls {$FACEPROX_TLS}
 	header {
 		# Enable HTTP Strict Transport Security (HSTS) to force clients to always connect via HTTPS
