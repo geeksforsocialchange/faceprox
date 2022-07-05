@@ -14,7 +14,7 @@ Alternatively you can build a docker image by cloning this repository, building 
 
 If you just want to run this with an SSL certificate using docker-compose:
 
-- Edit the [.env](.env) file to set the hostname and an email
+- Edit the [.env](.env) file to set the hostname and an email (Ensure that the hostname is prefixed with `https://`)
 - Check everything is working: `docker-compose up`
 
 ## Usage
