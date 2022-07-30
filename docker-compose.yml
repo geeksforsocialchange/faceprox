@@ -1,10 +1,15 @@
 version: '3.7'
 services:
+  tor:
+    container_name: tor
+    image: osminogin/tor-simple
   faceprox:
     container_name: faceprox
     build: .
     ports:
       - "127.0.0.1:8000:8000"
+    environment:
+      - http_proxy=socks5://tor:9150
     restart: unless-stopped
     security_opt:
       - no-new-privileges
