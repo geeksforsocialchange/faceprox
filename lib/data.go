@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func GetEvent(e string, c *cache.Cache) map[string]interface{} {
+func GetEvent(e string, c *cache.Cache, m *faceloader.MBasic) map[string]interface{} {
 	var result map[string]interface{}
 	var err error
 
@@ -16,7 +16,7 @@ func GetEvent(e string, c *cache.Cache) map[string]interface{} {
 		result = cachedResult.(map[string]interface{})
 	} else {
 		log.Println("cache miss")
-		result, err = faceloader.InterfaceFromMbasic(e)
+		result, err = m.InterfaceFromMbasic(e)
 		if err != nil {
 			log.Println(err)
 		}
@@ -25,7 +25,7 @@ func GetEvent(e string, c *cache.Cache) map[string]interface{} {
 	return result
 }
 
-func GetLinks(p string, c *cache.Cache) []string {
+func GetLinks(p string, c *cache.Cache, m *faceloader.MBasic) []string {
 	var mbasicLinks []string
 	var err error
 
@@ -35,7 +35,7 @@ func GetLinks(p string, c *cache.Cache) []string {
 		mbasicLinks = cachedLinks.([]string)
 	} else {
 		log.Println("cache miss")
-		mbasicLinks, err = faceloader.GetFacebookEventLinks(p)
+		mbasicLinks, err = m.GetFacebookEventLinks(p)
 		mbasicLinks = faceloader.RemoveDuplicateStr(mbasicLinks)
 		if err != nil {
 			log.Println(err)
@@ -46,13 +46,13 @@ func GetLinks(p string, c *cache.Cache) []string {
 	return mbasicLinks
 }
 
-func GetEvents(p string, c *cache.Cache) []map[string]interface{} {
+func GetEvents(p string, c *cache.Cache, m *faceloader.MBasic) []map[string]interface{} {
 	var events []map[string]interface{}
 
-	l := GetLinks(p, c)
+	l := GetLinks(p, c, m)
 
 	for i := range l {
-		event := GetEvent(l[i], c)
+		event := GetEvent(l[i], c, m)
 		events = append(events, event)
 	}
 	return events

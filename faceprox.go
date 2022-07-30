@@ -25,8 +25,12 @@ var eventsPage string
 
 var c *cache.Cache
 
+var m *faceloader.MBasic
+
 func main() {
 	c = cache.New(5*time.Minute, 10*time.Minute)
+
+	m = faceloader.NewMBasicClient()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
@@ -64,7 +68,7 @@ func PageHandler(w http.ResponseWriter, r *http.Request) {
 func EventDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	url := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
-	result := lib.GetEvent(url, c)
+	result := lib.GetEvent(url, c, m)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
 }
@@ -72,7 +76,7 @@ func EventDataHandler(w http.ResponseWriter, r *http.Request) {
 func EventIcalHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	url := fmt.Sprintf("https://mbasic.facebook.com/events/%v", vars["key"])
-	result := lib.GetEvent(url, c)
+	result := lib.GetEvent(url, c, m)
 	ics, err := faceloader.InterfaceToIcal(result)
 	if err != nil {
 		log.Println(err)
@@ -84,7 +88,7 @@ func EventIcalHandler(w http.ResponseWriter, r *http.Request) {
 func PageIcalHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	events := lib.GetEvents(vars["key"], c)
+	events := lib.GetEvents(vars["key"], c, m)
 	cal := ics.NewCalendar()
 
 	for i := range events {
@@ -101,7 +105,7 @@ func PageIcalHandler(w http.ResponseWriter, r *http.Request) {
 func PageDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	events := lib.GetEvents(vars["key"], c)
+	events := lib.GetEvents(vars["key"], c, m)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(events)
 }
