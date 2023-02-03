@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.19-alpine as build
+FROM golang:1.20-alpine as build
 WORKDIR /go/src/github.com/geeksforsocialchange/faceprox/
 COPY . .
 RUN apk --no-cache add ca-certificates
