@@ -3,7 +3,7 @@ module alicekaerast/faceprox
 go 1.18
 
 require (
-	github.com/arran4/golang-ical v0.0.0-20210825232153-efac1f4cb8ac
+	github.com/arran4/golang-ical v0.1.0
 	github.com/geeksforsocialchange/faceloader v0.0.0-20220731122218-9e21efff2363
 	github.com/gorilla/mux v1.8.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
